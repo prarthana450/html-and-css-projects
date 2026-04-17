@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>State Management Counter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #016e57 0%, #0aeebd 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .counter-card {
+            background: white;
+            padding: 3rem 4rem;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            text-align: center;
+            min-width: 380px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .counter-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        h1 {
+            color: #1f2937;
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 2rem;
+        }
+        #counter-value {
+            font-size: 6rem;
+            font-weight: 800;
+            line-height: 1;
+            margin: 2rem 0;
+            font-variant-numeric: tabular-nums;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Conditional Styling Classes */
+        .state-positive {
+            color: #964b05;
+            transform: scale(1.05);
+            text-shadow: 0 0 30px rgba(5, 150, 105, 0.3);
+        }
+
+        .state-negative {
+            color: #d31f1f;
+            transform: scale(1.05);
+            text-shadow: 0 0 30px rgba(220, 38, 38, 0.3);
+        }
+
+        .state-neutral {
+            color: #6b7280;
+            transform: scale(1);
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-increase {
+            background:  #016e57 ;
+            color: white;
+        }
+
+        .btn-decrease {
+            background:  #016e57 ;
+            color: white;
+        }
+
+        .btn-reset {
+            background: #a71e14;
+            color: #374151;
+        }
+
+        .btn-reset:hover {
+            background: #d1d5db;
+        }
+
+        .hint {
+            margin-top: 1.5rem;
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .updating {
+            animation: pulse 0.2s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="counter-card">
+        <h1>Counter App</h1>
+      
+        <div id="counter-value" class="state-neutral">0</div>
+        
+        <div class="controls">
+            <button class="btn-decrease" onclick="updateState('decrease')">Decrease</button>
+            <button class="btn-reset" onclick="updateState('reset')">Reset</button>
+            <button class="btn-increase" onclick="updateState('increase')">Increase</button>
+        </div>
+        
+        <p class="Hint">Keyboard: ↑↓ arrows to change, ESC to reset</p>
+    </div>
+
+    <script>
+ 
+        const appState = {
+            count: 0,
+            history: []
+        };
+
+  
+        function updateState(action) {
+            const previousState = appState.count;
+            
+            switch(action) {
+                case 'increase':
+                    appState.count++;
+                    appState.history.push({from: previousState, to: appState.count, action});
+                    break;
+                case 'decrease':
+                    appState.count--;
+                    appState.history.push({from: previousState, to: appState.count, action});
+                    break;
+                case 'reset':
+                    appState.count = 0;
+                    appState.history = []; 
+                    break;
+            }
+            
+
+            render();
+        }
+        function render() {
+            const displayElement = document.getElementById('counter-value');
+            const currentValue = appState.count;
+            displayElement.textContent = currentValue;
+
+            displayElement.classList.add('updating');
+            setTimeout(() => displayElement.classList.remove('updating'), 200);
+            displayElement.classList.remove('state-positive', 'state-negative', 'state-neutral');
+            
+            if (currentValue > 0) {
+                displayElement.classList.add('state-positive');
+            } else if (currentValue < 0) {
+                displayElement.classList.add('state-negative');
+            } else {
+                displayElement.classList.add('state-neutral');
+            }
+
+            console.log('Current State:', {
+                count: appState.count,
+                historyLength: appState.history.length,
+                lastAction: appState.history[appState.history.length - 1] || null
+            });
+        }
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp' || e.key === 'ArrowRight') {
+                updateState('increase');
+            } else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') {
+                updateState('decrease');
+            } else if (e.key === 'Escape') {
+                updateState('reset');
+            }
+        });
+        render();
+    </script>
+
+</body>
+</html>
