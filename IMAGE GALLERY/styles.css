@@ -1,0 +1,328 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(135deg, #e0b378 0%, #b69d5b 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* Main container - Horizontal scrolling layout */
+.container {
+  position: relative;
+  width: 95vw;
+  max-width: 1400px;
+  height: 70vh;
+  min-height: 400px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Carousel track - holds all panels */
+.carousel-track {
+  display: flex;
+  height: 100%;
+  gap: 12px;
+  padding: 12px;
+  animation: slideLeft 50s linear infinite;
+  will-change: transform;
+}
+
+/* Smooth horizontal sliding animation */
+@keyframes slideLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-100% - 120px));
+  }
+}
+
+/* Pause animation on hover */
+.carousel-track.paused {
+  animation-play-state: paused;
+}
+
+/* Panel styles */
+.panel {
+  flex: 0 0 280px;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  border-radius: 15px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Background overlay */
+.panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3), transparent);
+  z-index: 1;
+  transition: all 0.4s ease;
+}
+
+/* Panel content */
+.panel-content {
+  position: relative;
+  z-index: 2;
+  padding: 25px;
+  color: white;
+  text-align: center;
+  transform: translateY(10px);
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.panel h3 {
+  font-size: 1.6rem;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  margin-bottom: 8px;
+  opacity: 0.9;
+}
+
+.panel p {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  line-height: 1.4;
+}
+
+.panel-number {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 2rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.2);
+  z-index: 1;
+}
+
+/* Hover effects */
+.panel:hover {
+  transform: scale(1.08) translateY(-15px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.panel:hover::before {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.4), transparent);
+}
+
+.panel:hover .panel-content {
+  transform: translateY(0);
+}
+
+/* Active panel (clicked) */
+.panel.active {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) !important;
+  width: 90vw;
+  max-width: 700px;
+  height: 85vh;
+  max-height: 850px;
+  z-index: 1000;
+  border-radius: 25px;
+  animation: expandPanel 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes expandPanel {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Overlay background when expanded */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 999;
+  display: none;
+  animation: fadeIn 0.4s ease;
+}
+
+.overlay.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Close button */
+.close-btn {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid white;
+  border-radius: 50%;
+  color: white;
+  font-size: 28px;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  transition: all 0.3s ease;
+}
+
+.close-btn.show {
+  display: flex;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: rotate(90deg);
+}
+
+/* Auto play indicator */
+.indicator {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  color: white;
+  font-size: 0.9rem;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 10px 16px;
+  border-radius: 50px;
+  backdrop-filter: blur(10px);
+  z-index: 20;
+}
+
+.indicator.playing::after {
+  content: ' ▶';
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0.3;
+  }
+}
+
+/* Instructions overlay */
+.instructions {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  z-index: 20;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 12px 24px;
+  border-radius: 50px;
+  backdrop-filter: blur(10px);
+  animation: fadeInUp 1s ease forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    height: 50vh;
+    width: 98vw;
+  }
+
+  .panel {
+    flex: 0 0 200px;
+  }
+
+  .panel h3 {
+    font-size: 1.2rem;
+  }
+
+  .panel-content {
+    padding: 15px;
+  }
+
+  .panel.active {
+    width: 90vw;
+    height: 70vh;
+    max-width: 500px;
+    max-height: 700px;
+  }
+
+  .instructions {
+    font-size: 0.85rem;
+    padding: 10px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    height: 40vh;
+  }
+
+  .panel {
+    flex: 0 0 150px;
+  }
+
+  .panel h3 {
+    font-size: 1rem;
+  }
+
+  .panel-content {
+    padding: 10px;
+  }
+
+  .panel.active {
+    width: 95vw;
+    height: 80vh;
+    max-width: 100%;
+    max-height: 600px;
+    border-radius: 15px;
+  }
+}
